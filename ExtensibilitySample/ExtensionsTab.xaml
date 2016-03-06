@@ -8,7 +8,7 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <DataTemplate x:Key="ItemTemplate" x:DataType="local:TabData">
+        <DataTemplate x:Key="ItemTemplate" x:DataType="local:ExtensionModel">
             <StackPanel Orientation="Horizontal" Height="80">
                 <TextBlock Text="{x:Bind Title}" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
             </StackPanel>

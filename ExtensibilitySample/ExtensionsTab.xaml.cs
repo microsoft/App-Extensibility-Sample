@@ -24,15 +24,15 @@ namespace ExtensibilitySample
     public sealed partial class ExtensionsTab : Page
     {
 
-        public List<TabData> Items = null;
-        public ObservableCollection<TabData> Suggestions { get; private set; }
+        public List<ExtensionModel> Items = null;
+        public ObservableCollection<ExtensionModel> Suggestions { get; private set; }
 
         public ExtensionsTab()
         {
             this.InitializeComponent();
 
-            Items = TabData.GetSampleData().ToList();
-            this.Suggestions = new ObservableCollection<TabData>();
+            Items = ExtensionModel.GetSampleData().ToList();
+            this.Suggestions = new ObservableCollection<ExtensionModel>();
 
 
             this.DataContext = this;
@@ -46,11 +46,11 @@ namespace ExtensibilitySample
 
         private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            TabData FoundItem = null;
+            ExtensionModel FoundItem = null;
 
-            if (args.ChosenSuggestion != null && args.ChosenSuggestion is TabData)
+            if (args.ChosenSuggestion != null && args.ChosenSuggestion is ExtensionModel)
             {
-                FoundItem = args.ChosenSuggestion as TabData;
+                FoundItem = args.ChosenSuggestion as ExtensionModel;
             }
             else if (String.IsNullOrEmpty(args.QueryText) == false)
             {
@@ -69,10 +69,10 @@ namespace ExtensibilitySample
 
         private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-            ShowItem(args.SelectedItem as TabData);
+            ShowItem(args.SelectedItem as ExtensionModel);
         }
 
-        async private void ShowItem(TabData model)
+        async private void ShowItem(ExtensionModel model)
         {
             var MyDialog = new ContentDialog();
 
@@ -105,11 +105,11 @@ namespace ExtensibilitySample
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            TabData SelectedItem = null;
+            ExtensionModel SelectedItem = null;
 
             if (e.AddedItems.Count >= 1)
             {
-                SelectedItem = e.AddedItems[0] as TabData;
+                SelectedItem = e.AddedItems[0] as ExtensionModel;
                 (sender as ListView).SelectedItem = null;
                 ShowItem(SelectedItem);
             }

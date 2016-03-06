@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ExtensibilitySample
 {
-    public class TabData
+    public class ExtensionModel
     {
         public string Title { get; private set; }
 
-        public TabData(string title)
+        public ExtensionModel(string title)
         {
             this.Title = title;
         }
@@ -21,11 +21,11 @@ namespace ExtensibilitySample
             return this.Title;
         }
 
-        static public ObservableCollection<TabData> GetSampleData()
+        static public ObservableCollection<ExtensionModel> GetSampleData()
         {
-            var collection = new ObservableCollection<TabData>();
-            collection.Add(new TabData("Page 1"));
-            collection.Add(new TabData("Page 2"));
+            var collection = new ObservableCollection<ExtensionModel>();
+            collection.Add(new ExtensionModel("Page 1"));
+            collection.Add(new ExtensionModel("Page 2"));
             return collection;
         }
     }

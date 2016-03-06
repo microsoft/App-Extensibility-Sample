@@ -26,7 +26,7 @@
                         <Setter Target="ButtonPanelLeft.(RelativePanel.AlignRightWithPanel)" Value="False"/>
                         <Setter Target="ButtonPanelRight.(RelativePanel.AlignRightWithPanel)" Value="False"/>
 
-                        <Setter Target="Preview.MaxHeight" Value="500"/>
+                        <Setter Target="Preview.MaxHeight" Value="450"/>
                         <Setter Target="Preview.(RelativePanel.LeftOf)" Value=""/>
                     </VisualState.Setters>
                 </VisualState>

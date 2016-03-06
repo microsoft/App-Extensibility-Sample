@@ -106,7 +106,7 @@
       <DependentUpon>ExtensionsTab.xaml</DependentUpon>
     </Compile>
     <Compile Include="ImageTools.cs" />
-    <Compile Include="TabData.cs" />
+    <Compile Include="Extension.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
