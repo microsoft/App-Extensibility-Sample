@@ -8,10 +8,19 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <DataTemplate x:Key="ItemTemplate" x:DataType="local:ExtensionModel">
-            <StackPanel Orientation="Horizontal" Height="80">
-                <TextBlock Text="{x:Bind Title}" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
-            </StackPanel>
+        <DataTemplate x:Key="ItemTemplate" x:DataType="local:Extension">
+            <RelativePanel Height="80" HorizontalAlignment="Stretch" Width="323">
+                <TextBlock x:Name="ExtensionTitle" Text="{x:Bind AppExtension.DisplayName}" HorizontalAlignment="Stretch" VerticalAlignment="Center" 
+                           RelativePanel.AlignLeftWithPanel="True"/>
+                <TextBlock Text="{x:Bind AppExtension.Description}" HorizontalAlignment="Stretch" TextWrapping="Wrap"
+                           RelativePanel.AlignLeftWithPanel="True"
+                           RelativePanel.Below="ExtensionTitle"/>
+                <CheckBox IsChecked="{Binding Path=Enabled}" VerticalAlignment="Center" 
+                          RelativePanel.AlignRightWithPanel="True" 
+                          MinWidth="30" Checked="CheckBox_Checked"
+                          Unchecked="CheckBox_Unchecked"
+                          />
+            </RelativePanel>
         </DataTemplate>
     </Page.Resources>
 

@@ -24,18 +24,17 @@ namespace ExtensibilitySample
     public sealed partial class ExtensionsTab : Page
     {
 
-        public List<ExtensionModel> Items = null;
-        public ObservableCollection<ExtensionModel> Suggestions { get; private set; }
+        public ObservableCollection<Extension> Items = null;
+        public ObservableCollection<Extension> Suggestions { get; private set; }
 
         public ExtensionsTab()
         {
             this.InitializeComponent();
 
-            Items = ExtensionModel.GetSampleData().ToList();
-            this.Suggestions = new ObservableCollection<ExtensionModel>();
+            this.Suggestions = new ObservableCollection<Extension>();
 
-
-            this.DataContext = this;
+            Items = AppData.ExtensionManager.Extensions;
+            this.DataContext = Items;
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -46,17 +45,17 @@ namespace ExtensibilitySample
 
         private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            ExtensionModel FoundItem = null;
+            Extension FoundItem = null;
 
-            if (args.ChosenSuggestion != null && args.ChosenSuggestion is ExtensionModel)
+            if (args.ChosenSuggestion != null && args.ChosenSuggestion is Extension)
             {
-                FoundItem = args.ChosenSuggestion as ExtensionModel;
+                FoundItem = args.ChosenSuggestion as Extension;
             }
             else if (String.IsNullOrEmpty(args.QueryText) == false)
             {
                 foreach (var Item in Items)
                 {
-                    if (Item.Title.Equals(args.QueryText, StringComparison.OrdinalIgnoreCase))
+                    if (Item.AppExtension.DisplayName.Equals(args.QueryText, StringComparison.OrdinalIgnoreCase))
                     {
                         FoundItem = Item;
                         break;
@@ -69,10 +68,10 @@ namespace ExtensibilitySample
 
         private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-            ShowItem(args.SelectedItem as ExtensionModel);
+            ShowItem(args.SelectedItem as Extension);
         }
 
-        async private void ShowItem(ExtensionModel model)
+        async private void ShowItem(Extension model)
         {
             var MyDialog = new ContentDialog();
 
@@ -95,7 +94,7 @@ namespace ExtensibilitySample
                 Suggestions.Clear();
                 foreach (var Item in Items)
                 {
-                    if (Item.Title.IndexOf(sender.Text, StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (Item.AppExtension.DisplayName.IndexOf(sender.Text, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         Suggestions.Add(Item);
                     }
@@ -105,15 +104,35 @@ namespace ExtensibilitySample
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ExtensionModel SelectedItem = null;
+            Extension SelectedItem = null;
 
             if (e.AddedItems.Count >= 1)
             {
-                SelectedItem = e.AddedItems[0] as ExtensionModel;
+                SelectedItem = e.AddedItems[0] as Extension;
                 (sender as ListView).SelectedItem = null;
                 ShowItem(SelectedItem);
             }
 
+        }
+
+        private async void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = sender as CheckBox;
+            Extension ext = cb.DataContext as Extension;
+            if (!ext.Enabled)
+            {
+                await ext.Enable();
+            }
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = sender as CheckBox;
+            Extension ext = cb.DataContext as Extension;
+            if (ext.Enabled)
+            {
+                ext.Disable();
+            }
         }
     }
 }
