@@ -8,7 +8,7 @@
       <Example> This is a test command </Example>
       <ListenFor RequireAppName="BeforeOrAfterPhrase"> This is a test command </ListenFor>
       <Feedback> Here's an example </Feedback>
-      <Navigate />
+      <VoiceCommandService Target="ExtensibilityCortanaService"/>
     </Command>
   </CommandSet>
 </VoiceCommands>

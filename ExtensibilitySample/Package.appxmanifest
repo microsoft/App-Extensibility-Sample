@@ -27,10 +27,9 @@
           </uap3:AppExtensionHost>
         </uap3:Extension>
         <uap:Extension Category="windows.appService"
-            EntryPoint="ExtensibilitySample.CortanaService.Service">
-            <uap:AppService Name="ExtensibilitySampleAppService"/>
+            EntryPoint="CortanaService.Service">
+            <uap:AppService Name="ExtensibilityCortanaService"/>
         </uap:Extension>
-        <uap:Extension Category="windows.personalAssistantLaunch"/>
       </Extensions>
     </Application>
   </Applications>

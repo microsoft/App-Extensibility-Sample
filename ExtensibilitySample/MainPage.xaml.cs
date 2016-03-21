@@ -112,7 +112,7 @@ namespace ExtensibilitySample
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             Tab s = value as Tab;
-            return (MainPage.Current.Tabs.IndexOf(s) + 1) + ") " + s.Title;
+            return s.Title;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
