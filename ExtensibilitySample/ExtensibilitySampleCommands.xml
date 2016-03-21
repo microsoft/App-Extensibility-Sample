@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <VoiceCommands xmlns="http://schemas.microsoft.com/voicecommands/1.2">
-  <CommandSet xml:lang="en-us" Name="AdventureWorksCommandSet_en-us">
-    <AppName> Adventure Works </AppName>
-    <Example> Show trip to London </Example>
+  <CommandSet xml:lang="en-us" Name="ExtendCommandSet_en-us">
+    <AppName> Extend </AppName>
+    <Example> This is a test command </Example>
 
     <Command Name="sendMessageInCanvas">
       <Example> This is a test command </Example>
