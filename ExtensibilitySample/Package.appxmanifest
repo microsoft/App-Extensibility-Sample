@@ -26,10 +26,16 @@
             <uap3:Name>build2016.appextensibility.demo</uap3:Name>
           </uap3:AppExtensionHost>
         </uap3:Extension>
+        <uap:Extension Category="windows.appService"
+            EntryPoint="ExtensibilitySample.CortanaService.Service">
+            <uap:AppService Name="ExtensibilitySampleAppService"/>
+        </uap:Extension>
+        <uap:Extension Category="windows.personalAssistantLaunch"/>
       </Extensions>
     </Application>
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
+    <uap:Capability Name="picturesLibrary" />
   </Capabilities>
 </Package>

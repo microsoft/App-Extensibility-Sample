@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.ApplicationModel;
-using Windows.ApplicationModel.AppExtension;
+using Windows.ApplicationModel.AppExtensions;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation.Collections;

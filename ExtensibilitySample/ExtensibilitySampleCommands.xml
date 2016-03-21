@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<VoiceCommands xmlns="http://schemas.microsoft.com/voicecommands/1.2">
+  <CommandSet xml:lang="en-us" Name="AdventureWorksCommandSet_en-us">
+    <AppName> Adventure Works </AppName>
+    <Example> Show trip to London </Example>
+
+    <Command Name="sendMessageInCanvas">
+      <Example> This is a test command </Example>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase"> This is a test command </ListenFor>
+      <Feedback> Here's an example </Feedback>
+      <Navigate />
+    </Command>
+  </CommandSet>
+</VoiceCommands>
