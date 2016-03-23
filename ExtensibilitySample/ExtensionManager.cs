@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.ApplicationModel;
-using Windows.ApplicationModel.AppExtensions;
+using Windows.ApplicationModel.AppExtensions;  // App Extensions!!
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation.Collections;
@@ -140,7 +140,8 @@ namespace ExtensibilitySample
                     // ignore these package status events
                 }
 
-                // package is tampered or invalid or some other issue, remove the extensions
+                // package is tampered or invalid or some other issue
+                // glyphing the extensions would be a good user experience
                 else
                 {
                     await RemoveExtensions(args.Package);
@@ -165,7 +166,7 @@ namespace ExtensibilitySample
             if (!(ext.Package.Status.VerifyIsOK()
                     // This is where we'd normally do signature verfication, but for demo purposes it isn't important
                     // Below is an example of how you'd ensure that you only load store-signed extensions :)
-                    //&& extension.Package.SignatureKind == PackageSignatureKind.Store
+                    //&& ext.Package.SignatureKind == PackageSignatureKind.Store
                     ))
             {
                 // if this package doesn't meet our requirements
@@ -237,6 +238,7 @@ namespace ExtensibilitySample
             await _catalog.RequestRemovePackageAsync(ext.AppExtension.Package.Id.FullName);
         }
 
+        #region Extra exceptions
         // For exceptions using the Extension Manager
         public class ExtensionManagerException : Exception
         {
@@ -246,6 +248,7 @@ namespace ExtensibilitySample
 
             public ExtensionManagerException(string message, Exception inner) : base(message, inner) { }
         }
+        #endregion
     }
 
     public class Extension : INotifyPropertyChanged
