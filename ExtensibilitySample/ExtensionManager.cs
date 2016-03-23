@@ -48,6 +48,7 @@ namespace ExtensibilitySample
         // this sets up UI dispatcher and does initial extension scan
         public void Initialize()
         {
+            #region Error Checking & Dispatcher Setup
             // check that we haven't already been initialized
             if (_dispatcher != null)
             {
@@ -56,6 +57,7 @@ namespace ExtensibilitySample
 
             // thread that initializes the extension manager has the dispatcher
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
+            #endregion
 
             // set up extension management events
             _catalog.PackageInstalled += Catalog_PackageInstalled;
@@ -70,11 +72,13 @@ namespace ExtensibilitySample
 
         public async void FindAllExtensions()
         {
+            #region Error Checking
             // make sure we have initialized
             if (_dispatcher == null)
             {
                 throw new ExtensionManagerException("Extension Manager for " + this.Contract + " is not initialized.");
             }
+            #endregion
 
             // load all the extensions currently installed
             IReadOnlyList<AppExtension> extensions = await _catalog.FindAllAsync();
@@ -246,6 +250,7 @@ namespace ExtensibilitySample
 
     public class Extension : INotifyPropertyChanged
     {
+        #region Member Vars
         private AppExtension _extension;
         private ValueSet _properties;
         private bool _enabled;
@@ -259,6 +264,7 @@ namespace ExtensibilitySample
         private readonly object _sync = new object();
 
         public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
 
         public Extension(AppExtension ext, ValueSet properties, BitmapImage logo)
         {
@@ -278,6 +284,7 @@ namespace ExtensibilitySample
             _extwebview.ScriptNotify += ExtensionCallback;
         }
 
+        #region Properties
         public BitmapImage Logo
         {
             get { return _logo; }
@@ -312,6 +319,8 @@ namespace ExtensibilitySample
         {
             get { return _visibility; }
         }
+        #endregion
+
 
         // these are the calls to specific functions inside the app
 
@@ -334,6 +343,7 @@ namespace ExtensibilitySample
             }
         }
 
+        #region Update - NYI
         // calls the 'extensionUpdate' function
         // this is called whenever the data in the host app is updated so the extension
         // can keep track of the changes
@@ -353,6 +363,8 @@ namespace ExtensibilitySample
                 }
             }
         }
+        #endregion
+
 
         // called when the javascript in the extension signals a notify
         // we use this to receive image data from the callback
@@ -501,6 +513,7 @@ namespace ExtensibilitySample
                 Unload();
             }
         }
+        #region PropertyChanged
 
         // typical property changed handler
         private void RaisePropertyChanged(string name)
@@ -510,5 +523,7 @@ namespace ExtensibilitySample
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
         }
+        #endregion
+
     }
 }
