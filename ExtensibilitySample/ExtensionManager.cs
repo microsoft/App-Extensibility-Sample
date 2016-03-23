@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using System.ComponentModel;
+using Windows.UI.Popups;
 
 namespace ExtensibilitySample
 {
@@ -259,6 +260,7 @@ namespace ExtensibilitySample
         private bool _enabled;
         private bool _loaded;
         private bool _offline;
+        private string _serviceName;
         private string _uniqueId;
         private WebView _extwebview;
         private BitmapImage _logo;
@@ -279,6 +281,20 @@ namespace ExtensibilitySample
             _logo = logo;
             _visibility = Visibility.Collapsed;
             _extwebview = new WebView();    // this is the core functionality that will be executed
+
+            #region App Service
+            if (_properties != null)
+            {
+                PropertySet serviceProperty = _properties["Service"] as PropertySet;
+                if (serviceProperty != null) {
+                    _serviceName = serviceProperty["#text"].ToString();
+                } 
+                else
+                {
+                    _serviceName = null;
+                }
+            }
+            #endregion
 
             //AUMID + Extension ID is the unique identifier for an extension
             _uniqueId = ext.AppInfo.AppUserModelId + "!" + ext.Id;
@@ -333,16 +349,37 @@ namespace ExtensibilitySample
             // dont' try to invoke anything if it isn't loaded.
             if (this._loaded)
             {
-                // the script function may not exist
-                try
+                // invoke javascript if there is no service
+                if (_serviceName == null)
                 {
-                    await _extwebview.InvokeScriptAsync("extensionLoad", new string[] { str });
+                    // the script function may not exist
+                    try
+                    {
+                        await _extwebview.InvokeScriptAsync("extensionLoad", new string[] { str });
+                    }
+                    catch (Exception e)
+                    {
+                        //MessageDialog md = new MessageDialog("Invoking extension load failed!");
+                        //await md.ShowAsync();
+                    }
                 }
-                catch (Exception e)
+                #region App Service
+                // otherwise call the service
+                else
                 {
-                    //MessageDialog md = new MessageDialog("Invoking extension load failed!");
-                    //await md.ShowAsync();
+                    try
+                    {
+                        // do app service call
+                        MessageDialog md = new MessageDialog("Calling app service: " + _serviceName);
+                        await md.ShowAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        MessageDialog md = new MessageDialog("Invoking app service failed!");
+                        await md.ShowAsync();
+                    }
                 }
+                #endregion
             }
         }
 
@@ -414,6 +451,22 @@ namespace ExtensibilitySample
             this._properties = properties;
             this._logo = logo;
 
+            #region Update App Service
+            // update app service information
+            if (this._properties != null)
+            {
+                PropertySet serviceProperty = this._properties["Service"] as PropertySet;
+                if (serviceProperty != null)
+                {
+                    this._serviceName = serviceProperty["#text"].ToString();
+                }
+                else
+                {
+                    this._serviceName = null;
+                }
+            }
+            #endregion
+
             // load it
             await Load();
         }
@@ -456,7 +509,6 @@ namespace ExtensibilitySample
                     string extwebview = await FileIO.ReadTextAsync(extensionfile);
 
                     // load webview and navigate to it
-                    // this will run the app
                     _extwebview.NavigateToString(extwebview);
 
                     // all went well, set state
