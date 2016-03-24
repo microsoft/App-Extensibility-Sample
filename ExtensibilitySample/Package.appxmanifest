@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" IgnorableNamespaces="uap uap3 mp">
-  <Identity Name="703f2a49-3a15-4db9-b0d5-37f5b1f16e80" Publisher="CN=anaga" Version="1.0.0.0" />
+  <Identity Name="AppExtensibilityDemo" Publisher="CN=dbenne" Version="1.0.1.0" />
   <mp:PhoneIdentity PhoneProductId="703f2a49-3a15-4db9-b0d5-37f5b1f16e80" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>ExtensibilitySample</DisplayName>
-    <PublisherDisplayName>anaga</PublisherDisplayName>
+    <DisplayName>App Extensibility Demo</DisplayName>
+    <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
@@ -15,21 +15,21 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="ExtensibilitySample.App">
-      <uap:VisualElements DisplayName="#AppExtensibility #BUILD2016" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="ExtensibilitySample" BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
+      <uap:VisualElements DisplayName="#AppExtensibility #BUILD2016 Demo App" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="App Extensibility Demo App" BackgroundColor="transparent">
+        <uap:LockScreen Notification="badge" BadgeLogo="Assets\BadgeLogo.png" />
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" ShortName="App Extensibility">
         </uap:DefaultTile>
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#E7E6E6" />
       </uap:VisualElements>
       <Extensions>
+        <uap:Extension Category="windows.appService" EntryPoint="CortanaService.Service">
+          <uap:AppService Name="ExtensibilityCortanaService" />
+        </uap:Extension>
         <uap3:Extension Category="windows.appExtensionHost">
           <uap3:AppExtensionHost>
             <uap3:Name>build2016.appextensibility.demo</uap3:Name>
           </uap3:AppExtensionHost>
         </uap3:Extension>
-        <uap:Extension Category="windows.appService"
-            EntryPoint="CortanaService.Service">
-            <uap:AppService Name="ExtensibilityCortanaService"/>
-        </uap:Extension>
       </Extensions>
     </Application>
   </Applications>

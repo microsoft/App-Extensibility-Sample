@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.AppExtensions;  // App Extensions!!
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.AppExtensions;  // App Extensions!!
+using Windows.ApplicationModel.AppService;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.UI.Core;
+using Windows.UI.Popups;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
-using System.ComponentModel;
-using Windows.UI.Popups;
-using Windows.ApplicationModel.AppService;
-using System.Diagnostics;
 
 namespace ExtensibilitySample
 {
@@ -64,9 +64,9 @@ namespace ExtensibilitySample
 
             // set up extension management events
             _catalog.PackageInstalled += Catalog_PackageInstalled;
+            _catalog.PackageUpdated += Catalog_PackageUpdated;
             _catalog.PackageUninstalling += Catalog_PackageUninstalling;
             _catalog.PackageUpdating += Catalog_PackageUpdating;
-            _catalog.PackageUpdated += Catalog_PackageUpdated;
             _catalog.PackageStatusChanged += Catalog_PackageStatusChanged;
 
             // Scan all extensions
