@@ -13,6 +13,8 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using System.ComponentModel;
 using Windows.UI.Popups;
+using Windows.ApplicationModel.AppService;
+using System.Diagnostics;
 
 namespace ExtensibilitySample
 {
@@ -368,8 +370,39 @@ namespace ExtensibilitySample
                     try
                     {
                         // do app service call
-                        //MessageDialog md = new MessageDialog("Calling app service: " + _serviceName);
-                        //await md.ShowAsync();
+                        using (var connection = new AppServiceConnection())
+                        {
+                            // service name was in properties
+                            connection.AppServiceName = _serviceName;
+
+                            // package Family Name is in the extension
+                            connection.PackageFamilyName = _extension.Package.Id.FamilyName;
+
+                            // open connection
+                            AppServiceConnectionStatus status = await connection.OpenAsync();
+                            if (status != AppServiceConnectionStatus.Success)
+                            {
+                                Debug.WriteLine("Failed App Service Connection");
+                            }
+                            else
+                            {
+                                // send request to service
+                                var request = new ValueSet();
+                                request.Add("Command", "Load");
+                                request.Add("ImageString", AppData.currentImageString);
+
+                                // get response
+                                AppServiceResponse response = await connection.SendMessageAsync(request);
+                                if (response.Status == AppServiceResponseStatus.Success)
+                                {
+                                    // convert imagestring back
+                                    ValueSet message = response.Message as ValueSet;
+                                    string encodedImage = ImageTools.StripDataURIHeader(message["ImageString"] as string);
+                                    await AppData.currentImage.SetSourceAsync(ImageTools.DecodeStringToBitmapSource(encodedImage));
+                                    AppData.currentImageString = encodedImage;
+                                }
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
