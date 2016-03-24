@@ -73,7 +73,7 @@ namespace ExtensibilitySample
                     string imgstr = await ImageTools.FileToString(file);
                     if (imgstr != null)
                     {
-                        //await AppData.currentImage.SetSourceAsync(ImageTools.DecodeStringToBitmapSource(imgstr));
+                        await AppData.currentImage.SetSourceAsync(ImageTools.DecodeStringToBitmapSource(imgstr));
                         AppData.currentImageString = imgstr;
                     }
                 }
