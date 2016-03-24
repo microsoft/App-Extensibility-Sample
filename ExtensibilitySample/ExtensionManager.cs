@@ -182,7 +182,7 @@ namespace ExtensibilitySample
             if (existingExt == null)
             {
                 // get extension properties
-                ValueSet properties = await ext.GetExtensionPropertiesAsync() as ValueSet;
+                var properties = await ext.GetExtensionPropertiesAsync() as PropertySet;
 
                 // get logo 
                 var filestream = await (ext.AppInfo.DisplayInfo.GetLogo(new Windows.Foundation.Size(1, 1))).OpenReadAsync();
@@ -256,7 +256,7 @@ namespace ExtensibilitySample
     {
         #region Member Vars
         private AppExtension _extension;
-        private ValueSet _properties;
+        private PropertySet _properties;
         private bool _enabled;
         private bool _loaded;
         private bool _offline;
@@ -271,7 +271,7 @@ namespace ExtensibilitySample
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
-        public Extension(AppExtension ext, ValueSet properties, BitmapImage logo)
+        public Extension(AppExtension ext, PropertySet properties, BitmapImage logo)
         {
             _extension = ext;
             _properties = properties;
@@ -280,18 +280,16 @@ namespace ExtensibilitySample
             _offline = false;
             _logo = logo;
             _visibility = Visibility.Collapsed;
-            _extwebview = new WebView();    // this is the core functionality that will be executed
+            _extwebview = new WebView();    
 
-            #region App Service
+            #region Properties
+            _serviceName = null;
             if (_properties != null)
             {
-                PropertySet serviceProperty = _properties["Service"] as PropertySet;
-                if (serviceProperty != null) {
-                    _serviceName = serviceProperty["#text"].ToString();
-                } 
-                else
+                if (_properties.ContainsKey("Service"))
                 {
-                    _serviceName = null;
+                    PropertySet serviceProperty = _properties["Service"] as PropertySet;
+                    _serviceName = serviceProperty["#text"].ToString();
                 }
             }
             #endregion
@@ -370,8 +368,8 @@ namespace ExtensibilitySample
                     try
                     {
                         // do app service call
-                        MessageDialog md = new MessageDialog("Calling app service: " + _serviceName);
-                        await md.ShowAsync();
+                        //MessageDialog md = new MessageDialog("Calling app service: " + _serviceName);
+                        //await md.ShowAsync();
                     }
                     catch (Exception e)
                     {
@@ -408,7 +406,6 @@ namespace ExtensibilitySample
 
         // called when the javascript in the extension signals a notify
         // we use this to receive image data from the callback
-        // a fancier example would have multiple arguments indicating the type of data being returned
         private async void ExtensionCallback(object sender, NotifyEventArgs e)
         {
             if (this._loaded)
@@ -439,7 +436,7 @@ namespace ExtensibilitySample
             }
 
             // get extension properties
-            ValueSet properties = await ext.GetExtensionPropertiesAsync() as ValueSet;
+            var properties = await ext.GetExtensionPropertiesAsync() as PropertySet;
 
             // get logo 
             var filestream = await (ext.AppInfo.DisplayInfo.GetLogo(new Windows.Foundation.Size(1, 1))).OpenReadAsync();
@@ -451,18 +448,15 @@ namespace ExtensibilitySample
             this._properties = properties;
             this._logo = logo;
 
-            #region Update App Service
+            #region Update Properties
             // update app service information
+            this._serviceName = null;
             if (this._properties != null)
             {
-                PropertySet serviceProperty = this._properties["Service"] as PropertySet;
-                if (serviceProperty != null)
+                if (this._properties.ContainsKey("Service"))
                 {
+                    PropertySet serviceProperty = this._properties["Service"] as PropertySet;
                     this._serviceName = serviceProperty["#text"].ToString();
-                }
-                else
-                {
-                    this._serviceName = null;
                 }
             }
             #endregion
