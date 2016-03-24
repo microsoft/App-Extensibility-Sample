@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.ApplicationModel;
-using Windows.ApplicationModel.AppExtensions;
+using Windows.ApplicationModel.AppExtensions;  // App Extensions!!
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation.Collections;
@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using System.ComponentModel;
+using Windows.UI.Popups;
 
 namespace ExtensibilitySample
 {
@@ -48,6 +49,7 @@ namespace ExtensibilitySample
         // this sets up UI dispatcher and does initial extension scan
         public void Initialize()
         {
+            #region Error Checking & Dispatcher Setup
             // check that we haven't already been initialized
             if (_dispatcher != null)
             {
@@ -56,6 +58,7 @@ namespace ExtensibilitySample
 
             // thread that initializes the extension manager has the dispatcher
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
+            #endregion
 
             // set up extension management events
             _catalog.PackageInstalled += Catalog_PackageInstalled;
@@ -70,11 +73,13 @@ namespace ExtensibilitySample
 
         public async void FindAllExtensions()
         {
+            #region Error Checking
             // make sure we have initialized
             if (_dispatcher == null)
             {
                 throw new ExtensionManagerException("Extension Manager for " + this.Contract + " is not initialized.");
             }
+            #endregion
 
             // load all the extensions currently installed
             IReadOnlyList<AppExtension> extensions = await _catalog.FindAllAsync();
@@ -136,7 +141,8 @@ namespace ExtensibilitySample
                     // ignore these package status events
                 }
 
-                // package is tampered or invalid or some other issue, remove the extensions
+                // package is tampered or invalid or some other issue
+                // glyphing the extensions would be a good user experience
                 else
                 {
                     await RemoveExtensions(args.Package);
@@ -161,7 +167,7 @@ namespace ExtensibilitySample
             if (!(ext.Package.Status.VerifyIsOK()
                     // This is where we'd normally do signature verfication, but for demo purposes it isn't important
                     // Below is an example of how you'd ensure that you only load store-signed extensions :)
-                    //&& extension.Package.SignatureKind == PackageSignatureKind.Store
+                    //&& ext.Package.SignatureKind == PackageSignatureKind.Store
                     ))
             {
                 // if this package doesn't meet our requirements
@@ -233,6 +239,7 @@ namespace ExtensibilitySample
             await _catalog.RequestRemovePackageAsync(ext.AppExtension.Package.Id.FullName);
         }
 
+        #region Extra exceptions
         // For exceptions using the Extension Manager
         public class ExtensionManagerException : Exception
         {
@@ -242,15 +249,18 @@ namespace ExtensibilitySample
 
             public ExtensionManagerException(string message, Exception inner) : base(message, inner) { }
         }
+        #endregion
     }
 
     public class Extension : INotifyPropertyChanged
     {
+        #region Member Vars
         private AppExtension _extension;
         private ValueSet _properties;
         private bool _enabled;
         private bool _loaded;
         private bool _offline;
+        private string _serviceName;
         private string _uniqueId;
         private WebView _extwebview;
         private BitmapImage _logo;
@@ -259,6 +269,7 @@ namespace ExtensibilitySample
         private readonly object _sync = new object();
 
         public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
 
         public Extension(AppExtension ext, ValueSet properties, BitmapImage logo)
         {
@@ -271,6 +282,20 @@ namespace ExtensibilitySample
             _visibility = Visibility.Collapsed;
             _extwebview = new WebView();    // this is the core functionality that will be executed
 
+            #region App Service
+            if (_properties != null)
+            {
+                PropertySet serviceProperty = _properties["Service"] as PropertySet;
+                if (serviceProperty != null) {
+                    _serviceName = serviceProperty["#text"].ToString();
+                } 
+                else
+                {
+                    _serviceName = null;
+                }
+            }
+            #endregion
+
             //AUMID + Extension ID is the unique identifier for an extension
             _uniqueId = ext.AppInfo.AppUserModelId + "!" + ext.Id;
 
@@ -278,6 +303,7 @@ namespace ExtensibilitySample
             _extwebview.ScriptNotify += ExtensionCallback;
         }
 
+        #region Properties
         public BitmapImage Logo
         {
             get { return _logo; }
@@ -312,6 +338,8 @@ namespace ExtensibilitySample
         {
             get { return _visibility; }
         }
+        #endregion
+
 
         // these are the calls to specific functions inside the app
 
@@ -321,19 +349,41 @@ namespace ExtensibilitySample
             // dont' try to invoke anything if it isn't loaded.
             if (this._loaded)
             {
-                // the script function may not exist
-                try
+                // invoke javascript if there is no service
+                if (_serviceName == null)
                 {
-                    await _extwebview.InvokeScriptAsync("extensionLoad", new string[] { str });
+                    // the script function may not exist
+                    try
+                    {
+                        await _extwebview.InvokeScriptAsync("extensionLoad", new string[] { str });
+                    }
+                    catch (Exception e)
+                    {
+                        //MessageDialog md = new MessageDialog("Invoking extension load failed!");
+                        //await md.ShowAsync();
+                    }
                 }
-                catch (Exception e)
+                #region App Service
+                // otherwise call the service
+                else
                 {
-                    //MessageDialog md = new MessageDialog("Invoking extension load failed!");
-                    //await md.ShowAsync();
+                    try
+                    {
+                        // do app service call
+                        MessageDialog md = new MessageDialog("Calling app service: " + _serviceName);
+                        await md.ShowAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        MessageDialog md = new MessageDialog("Invoking app service failed!");
+                        await md.ShowAsync();
+                    }
                 }
+                #endregion
             }
         }
 
+        #region Update - NYI
         // calls the 'extensionUpdate' function
         // this is called whenever the data in the host app is updated so the extension
         // can keep track of the changes
@@ -353,6 +403,8 @@ namespace ExtensibilitySample
                 }
             }
         }
+        #endregion
+
 
         // called when the javascript in the extension signals a notify
         // we use this to receive image data from the callback
@@ -399,6 +451,22 @@ namespace ExtensibilitySample
             this._properties = properties;
             this._logo = logo;
 
+            #region Update App Service
+            // update app service information
+            if (this._properties != null)
+            {
+                PropertySet serviceProperty = this._properties["Service"] as PropertySet;
+                if (serviceProperty != null)
+                {
+                    this._serviceName = serviceProperty["#text"].ToString();
+                }
+                else
+                {
+                    this._serviceName = null;
+                }
+            }
+            #endregion
+
             // load it
             await Load();
         }
@@ -441,7 +509,6 @@ namespace ExtensibilitySample
                     string extwebview = await FileIO.ReadTextAsync(extensionfile);
 
                     // load webview and navigate to it
-                    // this will run the app
                     _extwebview.NavigateToString(extwebview);
 
                     // all went well, set state
@@ -501,6 +568,7 @@ namespace ExtensibilitySample
                 Unload();
             }
         }
+        #region PropertyChanged
 
         // typical property changed handler
         private void RaisePropertyChanged(string name)
@@ -510,5 +578,7 @@ namespace ExtensibilitySample
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
         }
+        #endregion
+
     }
 }
