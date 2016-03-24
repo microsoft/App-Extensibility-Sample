@@ -10,6 +10,7 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Windows.ApplicationModel.AppService;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -27,12 +28,10 @@ namespace ExtensibilitySample
             this.InitializeComponent();
             //DataContext = AppData.currentImage;
             DataContext = AppData.ExtensionManager.Extensions;
-
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            Debug.WriteLine(this.ActualWidth);
             base.OnNavigatedTo(e);
         }
 
@@ -40,6 +39,7 @@ namespace ExtensibilitySample
         // run an extension button
         private void Run_Click(object sender, RoutedEventArgs e)
         {
+
             // test the extension
             Button btn = sender as Button;
             Extension ext = btn.DataContext as Extension;
@@ -73,7 +73,7 @@ namespace ExtensibilitySample
                     string imgstr = await ImageTools.FileToString(file);
                     if (imgstr != null)
                     {
-                        await AppData.currentImage.SetSourceAsync(ImageTools.DecodeStringToBitmapSource(imgstr));
+                        //await AppData.currentImage.SetSourceAsync(ImageTools.DecodeStringToBitmapSource(imgstr));
                         AppData.currentImageString = imgstr;
                     }
                 }
@@ -92,7 +92,7 @@ namespace ExtensibilitySample
 
         private async void Crop_Click(object sender, RoutedEventArgs e)
         {
-            // open file
+            // Load a File Picker that shows image file types
             FileOpenPicker open = new FileOpenPicker();
             open.FileTypeFilter.Add(".jpg");
             open.FileTypeFilter.Add(".png");
@@ -101,17 +101,18 @@ namespace ExtensibilitySample
             open.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
             open.CommitButtonText = "Open";
 
-            // Open a stream for the selected file 
+            // Wait for user to select a file 
             StorageFile source = await open.PickSingleFileAsync();
 
-            // load the file as the image
+            // Verify the source is not null
             if (source != null)
             {
                 try
                 {
+                    // Create a destination file
                     StorageFile dest = await KnownFolders.PicturesLibrary.CreateFileAsync("Cropped.jpg", CreationCollisionOption.ReplaceExisting);
 
-                    // Receive launch result from CropImage
+                    // Call CropImageAsync and receive Result
                     LaunchUriResult result = await this.CropImageAsync(source, dest, 500, 500);
 
                     // Verify result and load picture into the source
@@ -133,6 +134,42 @@ namespace ExtensibilitySample
                 }
             }
         }
+
+        private async void Grayscale_Click(object sender, RoutedEventArgs e)
+        {
+            using (var connection = new AppServiceConnection())
+            {
+                connection.AppServiceName = "com.microsoft.grayscaleservice";
+                connection.PackageFamilyName = "b64664a8-585b-4df5-b615-bf026b2e83ec_03b8hcrt8a6xy";
+
+                AppServiceConnectionStatus status = await connection.OpenAsync();
+                if (status != AppServiceConnectionStatus.Success)
+                {
+                    Debug.WriteLine("Failed App Service Connection");
+                }
+                else
+                {
+                    Debug.WriteLine("OpenAsync succeeded!\n");
+
+                    var request = new ValueSet();
+                    request.Add("Command", "Grayscale");
+                    request.Add("ImageString", AppData.currentImageString);
+                    var response = await connection.SendMessageAsync(request);
+
+                    if (response.Status == AppServiceResponseStatus.Success)
+                    {
+                        Debug.WriteLine("App Service Start Succeeded");
+                        string imageString = response.Message["ImageString"] as string;
+
+                        await AppData.currentImage.SetSourceAsync(ImageTools.DecodeStringToBitmapSource(imageString));
+                        AppData.currentImageString = imageString;
+                        
+                    }
+
+                }
+            }
+        }
+
 
         private async Task<LaunchUriResult> CropImageAsync(IStorageFile input, IStorageFile destination, int width, int height)
         {

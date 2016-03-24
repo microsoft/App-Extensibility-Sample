@@ -1,20 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.AppService;
 using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.VoiceCommands;
-using Windows.Graphics.Imaging;
-using Windows.Storage;
-using Windows.Storage.Streams;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Markup;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace CortanaService
@@ -65,10 +54,11 @@ namespace CortanaService
                     this.serviceDeferral.Complete();
                 }
             }
+
         }
 
-
-        private void VoiceCommandCompleted(VoiceCommandServiceConnection sender, VoiceCommandCompletedEventArgs args)
+        private void VoiceCommandCompleted(VoiceCommandServiceConnection sender, 
+            VoiceCommandCompletedEventArgs args)
         {
             if (this.serviceDeferral != null)
             {
@@ -76,7 +66,8 @@ namespace CortanaService
             }
         }
 
-        private void OnTaskCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
+        private void OnTaskCanceled(IBackgroundTaskInstance sender, 
+            BackgroundTaskCancellationReason reason)
         {
             if (this.serviceDeferral != null)
             {
