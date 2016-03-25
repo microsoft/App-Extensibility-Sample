@@ -9,47 +9,31 @@
 
     <Page.Resources>
         <DataTemplate x:Key="ItemTemplate" x:DataType="local:Extension">
-            <RelativePanel Height="80" HorizontalAlignment="Stretch" Width="323">
-                <TextBlock x:Name="ExtensionTitle" Text="{x:Bind AppExtension.DisplayName}" HorizontalAlignment="Stretch" VerticalAlignment="Center" 
-                           RelativePanel.AlignLeftWithPanel="True"/>
-                <TextBlock Text="{x:Bind AppExtension.Description}" HorizontalAlignment="Stretch" TextWrapping="Wrap"
-                           RelativePanel.AlignLeftWithPanel="True"
-                           RelativePanel.Below="ExtensionTitle"/>
-                <CheckBox IsChecked="{Binding Path=Enabled}" VerticalAlignment="Center" 
-                          RelativePanel.AlignRightWithPanel="True" 
+            <RelativePanel Margin="20,5,5,10"  Height="65" HorizontalAlignment="Left" Width="375">
+                <Image Margin="5,0,5,0" Source="{Binding Path=Logo}" x:Name="ExtensionLogo" 
+                        RelativePanel.RightOf="ExtensionCheckbox" ></Image>
+                <TextBlock Margin="10,10,0,0" x:Name="ExtensionTitle" FontWeight="Bold" Text="{x:Bind AppExtension.DisplayName}" HorizontalAlignment="Stretch" VerticalAlignment="Center" 
+                           RelativePanel.RightOf="ExtensionLogo" RelativePanel.AlignTopWithPanel="True"/>
+                <TextBlock Margin="10,0,0,10" Text="{x:Bind AppExtension.Description}" HorizontalAlignment="Stretch" TextWrapping="Wrap"
+                           RelativePanel.RightOf="ExtensionLogo"
+                           RelativePanel.AlignBottomWithPanel="True"/>
+                <CheckBox x:Name="ExtensionCheckbox" IsChecked="{Binding Path=Enabled}" VerticalAlignment="Center" 
+                          RelativePanel.AlignLeftWithPanel="True" 
+                          RelativePanel.AlignVerticalCenterWithPanel="True"
                           MinWidth="30" Checked="CheckBox_Checked"
                           Unchecked="CheckBox_Unchecked"
                           />
+                <Button Margin="20,0,10,0"
+                        RelativePanel.AlignVerticalCenterWithPanel="True" 
+                        RelativePanel.AlignRightWithPanel="True"
+                        Click="RemoveButton_Click"
+                        >Remove</Button>
             </RelativePanel>
         </DataTemplate>
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState x:Name="MobileLayout">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="0" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="SearchBox.Visibility" Value="Collapsed" />
-                        <Setter Target="CompactSearchBox.Visibility" Value="Visible" />
-                    </VisualState.Setters>
-                </VisualState>
-                <VisualState x:Name="WideLayout">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="850" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="SearchBox.Width" Value="200" />
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
-
         <Pivot>
-
             <Pivot.LeftHeader>
                 <AppBarButton Icon="Back" Click="BackButton_Click" />
             </Pivot.LeftHeader>
@@ -58,32 +42,12 @@
                 <Grid>
                     <AppBarButton Icon="Find" x:Name="CompactSearchBox" Visibility="Collapsed"
                                   VerticalAlignment="Stretch">
-                        <AppBarButton.Flyout>
-                            <Flyout>
-                                <AutoSuggestBox  
-                                VerticalAlignment="Center" Width="250" Margin="4,4,8,4" 
-                                QueryIcon="Find" PlaceholderText="enter a search term"
-                                TextChanged="AutoSuggestBox_TextChanged"
-                                QuerySubmitted="AutoSuggestBox_QuerySubmitted"
-                                SuggestionChosen="AutoSuggestBox_SuggestionChosen"
-                                ItemsSource="{x:Bind Suggestions}"/>
-                            </Flyout>
-                        </AppBarButton.Flyout>
                     </AppBarButton>
-
-                    <AutoSuggestBox x:Name="SearchBox"  
-                                VerticalAlignment="Center" Width="250" Margin="4,4,8,4" 
-                                QueryIcon="Find" PlaceholderText="enter a search term"
-                                TextChanged="AutoSuggestBox_TextChanged"
-                                QuerySubmitted="AutoSuggestBox_QuerySubmitted"
-                                SuggestionChosen="AutoSuggestBox_SuggestionChosen"
-                                ItemsSource="{x:Bind Suggestions}"/>
                 </Grid>
             </Pivot.RightHeader>
 
             <PivotItem Header="All">
-                <ListView ItemsSource="{x:Bind Items}" ItemTemplate="{StaticResource ItemTemplate}" 
-                          SelectionChanged="ListView_SelectionChanged" />
+                <ItemsControl ItemsSource="{x:Bind Items}" ItemTemplate="{StaticResource ItemTemplate}" />
             </PivotItem>
         </Pivot>
     </Grid>

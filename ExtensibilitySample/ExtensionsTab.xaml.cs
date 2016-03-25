@@ -43,78 +43,6 @@ namespace ExtensibilitySample
                 this.Frame.GoBack();
         }
 
-        private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            Extension FoundItem = null;
-
-            if (args.ChosenSuggestion != null && args.ChosenSuggestion is Extension)
-            {
-                FoundItem = args.ChosenSuggestion as Extension;
-            }
-            else if (String.IsNullOrEmpty(args.QueryText) == false)
-            {
-                foreach (var Item in Items)
-                {
-                    if (Item.AppExtension.DisplayName.Equals(args.QueryText, StringComparison.OrdinalIgnoreCase))
-                    {
-                        FoundItem = Item;
-                        break;
-                    }
-                }
-            }
-
-            ShowItem(FoundItem);
-        }
-
-        private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-            ShowItem(args.SelectedItem as Extension);
-        }
-
-        async private void ShowItem(Extension model)
-        {
-            var MyDialog = new ContentDialog();
-
-            if (model == null)
-            {
-                MyDialog.Title = "No item found";
-
-            }
-
-            MyDialog.PrimaryButtonText = "OK";
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () => await MyDialog.ShowAsync());
-
-        }
-
-        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-            // TODO: not being called from flyout
-            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
-            {
-                Suggestions.Clear();
-                foreach (var Item in Items)
-                {
-                    if (Item.AppExtension.DisplayName.IndexOf(sender.Text, StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        Suggestions.Add(Item);
-                    }
-                }
-            }
-        }
-
-        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Extension SelectedItem = null;
-
-            if (e.AddedItems.Count >= 1)
-            {
-                SelectedItem = e.AddedItems[0] as Extension;
-                (sender as ListView).SelectedItem = null;
-                ShowItem(SelectedItem);
-            }
-
-        }
-
         private async void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             CheckBox cb = sender as CheckBox;
@@ -133,6 +61,14 @@ namespace ExtensibilitySample
             {
                 ext.Disable();
             }
+        }
+
+        private void RemoveButton_Click(object sender, RoutedEventArgs e)
+        {
+            // remove the package
+            Button btn = sender as Button;
+            Extension ext = btn.DataContext as Extension;
+            AppData.ExtensionManager.RemoveExtension(ext);
         }
     }
 }
