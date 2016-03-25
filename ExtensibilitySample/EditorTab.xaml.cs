@@ -140,7 +140,7 @@ namespace ExtensibilitySample
             using (var connection = new AppServiceConnection())
             {
                 connection.AppServiceName = "com.microsoft.grayscaleservice";
-                connection.PackageFamilyName = "b64664a8-585b-4df5-b615-bf026b2e83ec_03b8hcrt8a6xy";
+                connection.PackageFamilyName = "AppExtensibility.Extension.Grayscale_byq669axdz8jy";
 
                 AppServiceConnectionStatus status = await connection.OpenAsync();
                 if (status != AppServiceConnectionStatus.Success)

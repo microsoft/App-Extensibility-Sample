@@ -340,31 +340,26 @@ namespace ExtensibilitySample
         }
         #endregion
 
-
-        // these are the calls to specific functions inside the app
-
         // this calls the 'extensionLoad' function in the script file, if it exists.
         public async void InvokeLoad(string str)
         {
-            // dont' try to invoke anything if it isn't loaded.
             if (this._loaded)
             {
-                // invoke javascript if there is no service
                 if (_serviceName == null)
                 {
-                    // the script function may not exist
                     try
                     {
+                        // this is dangerous!
                         await _extwebview.InvokeScriptAsync("extensionLoad", new string[] { str });
                     }
                     catch (Exception e)
                     {
-                        //MessageDialog md = new MessageDialog("Invoking extension load failed!");
-                        //await md.ShowAsync();
+                        // show errors
+                        return;
                     }
                 }
                 #region App Service
-                // otherwise call the service
+                // App services are a better approach!
                 else
                 {
                     try
@@ -397,7 +392,6 @@ namespace ExtensibilitySample
                                 AppServiceResponse response = await connection.SendMessageAsync(request);
                                 if (response.Status == AppServiceResponseStatus.Success)
                                 {
-                                    // convert imagestring back
                                     ValueSet message = response.Message as ValueSet;
                                     if (message.ContainsKey("Pixels") &&
                                         message.ContainsKey("Height") &&
@@ -407,10 +401,14 @@ namespace ExtensibilitySample
                                         int height = (int) message["Height"];
                                         int width = (int) message["Width"];
 
-                                        // encode the bytes to a string, and then the image.
+                                        #region Set Image to the new pixels
+                                        // encode the bytes to a string, and then the image
+                                        // this is for interop with the js extensions
+                                        // wouldn't be needed if all extensions were implemented as app services
                                         string encodedImage = await ImageTools.EncodeBytesToPNGString(pixels, (uint)width, (uint)height);
                                         await AppData.currentImage.SetSourceAsync(ImageTools.DecodeStringToBitmapSource(encodedImage));
                                         AppData.currentImageString = encodedImage;
+                                        #endregion
                                     }
                                 }
                             }
@@ -463,8 +461,6 @@ namespace ExtensibilitySample
                 }
                 catch (Exception ex)
                 {
-                    //MessageDialog error = new MessageDialog("Error converting image from Extension.");
-                    //await error.ShowAsync();
                     return;
                 }
             }
@@ -513,6 +509,7 @@ namespace ExtensibilitySample
         // this controls loading of the extension
         public async Task Load()
         {
+            #region Error Checking
             // if it's not enabled or already loaded, don't load it
             if (!_enabled || _loaded)
             {
@@ -524,6 +521,7 @@ namespace ExtensibilitySample
             {
                 return;
             }
+            #endregion
 
             // Extension is not loaded and enabled - load it
             StorageFolder folder = await _extension.GetPublicFolderAsync();
@@ -548,6 +546,8 @@ namespace ExtensibilitySample
                     string extwebview = await FileIO.ReadTextAsync(extensionfile);
 
                     // load webview and navigate to it
+                    // this is dangerous and for demo purposes only
+                    //you should never load untrusted script
                     _extwebview.NavigateToString(extwebview);
 
                     // all went well, set state
