@@ -149,23 +149,33 @@ namespace ExtensibilitySample
                 }
                 else
                 {
-                    Debug.WriteLine("OpenAsync succeeded!\n");
-
+                    // send request to service
                     var request = new ValueSet();
-                    request.Add("Command", "Grayscale");
-                    request.Add("ImageString", AppData.currentImageString);
-                    var response = await connection.SendMessageAsync(request);
+                    request.Add("Command", "Load");
+                    request.Add("Pixels", ImageTools.GetBitmapBytes(AppData.currentImage));
+                    request.Add("Height", AppData.currentImage.PixelHeight);
+                    request.Add("Width", AppData.currentImage.PixelWidth);
 
+                    // get response
+                    AppServiceResponse response = await connection.SendMessageAsync(request);
                     if (response.Status == AppServiceResponseStatus.Success)
                     {
-                        Debug.WriteLine("App Service Start Succeeded");
-                        string imageString = response.Message["ImageString"] as string;
+                        // convert imagestring back
+                        ValueSet message = response.Message as ValueSet;
+                        if (message.ContainsKey("Pixels") &&
+                            message.ContainsKey("Height") &&
+                            message.ContainsKey("Width"))
+                        {
+                            byte[] pixels = message["Pixels"] as byte[];
+                            int height = (int)message["Height"];
+                            int width = (int)message["Width"];
 
-                        await AppData.currentImage.SetSourceAsync(ImageTools.DecodeStringToBitmapSource(imageString));
-                        AppData.currentImageString = imageString;
-                        
+                            // encode the bytes to a string, and then the image.
+                            string encodedImage = await ImageTools.EncodeBytesToPNGString(pixels, (uint)width, (uint)height);
+                            await AppData.currentImage.SetSourceAsync(ImageTools.DecodeStringToBitmapSource(encodedImage));
+                            AppData.currentImageString = encodedImage;
+                        }
                     }
-
                 }
             }
         }
