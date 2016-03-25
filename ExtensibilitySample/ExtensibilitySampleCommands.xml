@@ -1,14 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <VoiceCommands xmlns="http://schemas.microsoft.com/voicecommands/1.2">
   <CommandSet xml:lang="en-us" Name="ExtendCommandSet_en-us">
-    <AppName> Extend </AppName>
-    <Example> This is a test command </Example>
+    <AppName> Build Sample </AppName>
+    <Example> Build Sample what can your app service do? </Example>
 
-    <Command Name="sendMessageInCanvas">
-      <Example> This is a test command </Example>
-      <ListenFor RequireAppName="BeforeOrAfterPhrase"> This is a test command </ListenFor>
-      <Feedback> Here's an example </Feedback>
+    <Command Name="appServiceMessage">
+      <Example> Build Sample what can your app service do? </Example>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase"> What can your app service do </ListenFor>
       <VoiceCommandService Target="ExtensibilityCortanaService"/>
     </Command>
+
+    <Command Name="cropMessage">
+      <Example> Build Sample show me my cropped picture </Example>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase"> Show me my cropped picture </ListenFor>
+      <VoiceCommandService Target="ExtensibilityCortanaService"/>
+    </Command>
+    
   </CommandSet>
 </VoiceCommands>
